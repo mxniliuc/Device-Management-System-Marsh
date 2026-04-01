@@ -1,0 +1,18 @@
+{
+  "name": "device-management-database",
+  "private": true,
+  "version": "1.0.0",
+  "description": "MongoDB database create/seed scripts",
+  "scripts": {
+    "create-db": "node src/scripts/create-db.js",
+    "seed-db": "node src/scripts/seed-db.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "mongodb": "^6.19.0",
+    "mongoose": "^9.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
