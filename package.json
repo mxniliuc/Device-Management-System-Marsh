@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db:create": "npm --prefix database run create-db"
+    "db:create": "npm --prefix database run create-db",
+    "db:seed": "npm --prefix database run seed-db"
   },
   "repository": {
     "type": "git",

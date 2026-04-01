@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "MongoDB database create/seed scripts",
   "scripts": {
-    "create-db": "node create-db.js"
+    "create-db": "node src/scripts/create-db.js",
+    "seed-db": "node src/scripts/seed-db.js"
   },
   "dependencies": {
     "dotenv": "^16.6.1",

@@ -11,7 +11,7 @@ function getDbNameFromUri(uri) {
   const pathname = url.pathname || '';
   const dbFromPath = pathname.replace(/^\//, '');
   if (!dbFromPath) {
-    throw new Error('MONGODB_URI must include a database name (e.g. mongodb://127.0.0.1:27017/device_management)');
+    throw new Error('MONGODB_URI must include a database URI');
   }
   return dbFromPath;
 }
