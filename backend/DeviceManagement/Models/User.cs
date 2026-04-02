@@ -18,5 +18,11 @@ public sealed class User
 
     [BsonElement("location")]
     public string Location { get; set; } = string.Empty;
+
+    [BsonElement("createdAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+[BsonElement("updatedAt")]
+public DateTime? UpdatedAt { get; set; }
 }
 

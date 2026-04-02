@@ -41,5 +41,14 @@ public sealed class Device
     [BsonRepresentation(BsonType.ObjectId)]
     [BsonElement("assignedToUserId")]
     public string? AssignedToUserId { get; set; }
+    
+    [BsonElement("createdAt")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    [BsonElement("updatedAt")]
+    public DateTime? UpdatedAt { get; set; }
+
+    [BsonElement("assignedAt")]
+    public DateTime? AssignedAt { get; set; }
 }
 
