@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DeviceManagement.IntegrationTests/DeviceManagement.IntegrationTests.csproj" />
+  <Project Path="DeviceManagement/DeviceManagement.csproj" />
+</Solution>
