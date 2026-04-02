@@ -2,3 +2,8 @@
 .env.example
 requirements.txt
 node_modules
+appsettings.json
+bin/
+obj/
+.nuget/
+obj/
