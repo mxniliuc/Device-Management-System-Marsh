@@ -6,5 +6,5 @@ appsettings.json
 bin/
 obj/
 .nuget/
-../backend/DeviceManagement/obj/
-../backend/DeviceManagement/bin/
+./backend/DeviceManagement/obj/
+./backend/DeviceManagement/bin/
