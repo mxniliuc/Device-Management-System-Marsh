@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using DeviceManagement.Contracts.Users;
 using DeviceManagement.Models;
 using DeviceManagement.Repositories;
+using DeviceManagement.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeviceManagement.Controllers;
@@ -23,7 +25,9 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetById([FromRoute] string id, CancellationToken ct)
+    public async Task<ActionResult<User>> GetById(
+        [FromRoute][RegularExpression(ValidationPatterns.MongoObjectId, ErrorMessage = "Id must be a 24-character hex MongoDB ObjectId.")] string id,
+        CancellationToken ct)
     {
         var user = await _users.GetByIdAsync(id, ct);
         if (user is null) return NotFound();
@@ -45,7 +49,10 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] string id, [FromBody] UpdateUserRequest request, CancellationToken ct)
+    public async Task<IActionResult> Update(
+        [FromRoute][RegularExpression(ValidationPatterns.MongoObjectId, ErrorMessage = "Id must be a 24-character hex MongoDB ObjectId.")] string id,
+        [FromBody] UpdateUserRequest request,
+        CancellationToken ct)
     {
         var user = new User
         {
@@ -59,7 +66,9 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] string id, CancellationToken ct)
+    public async Task<IActionResult> Delete(
+        [FromRoute][RegularExpression(ValidationPatterns.MongoObjectId, ErrorMessage = "Id must be a 24-character hex MongoDB ObjectId.")] string id,
+        CancellationToken ct)
     {
         var deleted = await _users.DeleteAsync(id, ct);
         return deleted ? NoContent() : NotFound();
