@@ -115,7 +115,7 @@ async function run() {
       {
         name: 'iPhone 15 Pro',
         manufacturer: 'Apple',
-        type: 'phone',
+        type: 'Phone',
         os: 'iOS',
         osVersion: '18.1',
         processor: 'A17 Pro',
@@ -128,7 +128,7 @@ async function run() {
       {
         name: 'Galaxy Tab S10',
         manufacturer: 'Samsung',
-        type: 'tablet',
+        type: 'Tablet',
         os: 'Android',
         osVersion: '15',
         processor: 'Snapdragon 8 Gen 4',
@@ -141,7 +141,7 @@ async function run() {
       {
         name: 'Pixel 9',
         manufacturer: 'Google',
-        type: 'phone',
+        type: 'Phone',
         os: 'Android',
         osVersion: '15',
         processor: 'Tensor G5',
@@ -154,7 +154,7 @@ async function run() {
       {
         name: 'iPad Air',
         manufacturer: 'Apple',
-        type: 'tablet',
+        type: 'Tablet',
         os: 'iPadOS',
         osVersion: '18.0',
         processor: 'M2',

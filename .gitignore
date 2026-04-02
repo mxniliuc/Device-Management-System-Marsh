@@ -2,3 +2,9 @@
 .env.example
 requirements.txt
 node_modules
+appsettings.json
+bin/
+obj/
+.nuget/
+./backend/DeviceManagement/obj/
+./backend/DeviceManagement/bin/
