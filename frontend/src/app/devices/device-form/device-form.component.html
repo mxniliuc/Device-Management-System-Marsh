@@ -1,0 +1,115 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <a routerLink="/devices" class="back">← All devices</a>
+      <h1>{{ mode === 'create' ? 'Add device' : 'Edit device' }}</h1>
+      <p class="page__lede">
+        All fields are required except assignment — leave unassigned if nobody is using it yet.
+      </p>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="banner banner--error" role="alert">{{ loadError() }}</div>
+  } @else if (loading()) {
+    <p class="state state--muted" role="status">Loading…</p>
+  } @else {
+    <form class="form" (ngSubmit)="submit()" [formGroup]="form" novalidate>
+      @if (formError()) {
+        <div class="banner banner--error" role="alert">{{ formError() }}</div>
+      }
+
+      <div class="form__grid">
+        <label class="field">
+          <span class="field__label">Name</span>
+          <input formControlName="name" type="text" autocomplete="off" />
+          @if (fieldError('name')) {
+            <span class="field__err">{{ fieldError('name') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Manufacturer</span>
+          <input formControlName="manufacturer" type="text" autocomplete="organization" />
+          @if (fieldError('manufacturer')) {
+            <span class="field__err">{{ fieldError('manufacturer') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Type</span>
+          <select formControlName="type">
+            @for (t of typeOptions; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Operating system</span>
+          <input formControlName="os" type="text" />
+          @if (fieldError('os')) {
+            <span class="field__err">{{ fieldError('os') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">OS version</span>
+          <input formControlName="osVersion" type="text" />
+          @if (fieldError('osVersion')) {
+            <span class="field__err">{{ fieldError('osVersion') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Processor</span>
+          <input formControlName="processor" type="text" />
+          @if (fieldError('processor')) {
+            <span class="field__err">{{ fieldError('processor') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">RAM (GB)</span>
+          <input formControlName="ramGb" type="number" min="1" max="4096" step="1" />
+          @if (fieldError('ramGb')) {
+            <span class="field__err">{{ fieldError('ramGb') }}</span>
+          }
+        </label>
+
+        <label class="field field--wide">
+          <span class="field__label">Description</span>
+          <textarea formControlName="description" rows="3"></textarea>
+          @if (fieldError('description')) {
+            <span class="field__err">{{ fieldError('description') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Location</span>
+          <input formControlName="location" type="text" />
+          @if (fieldError('location')) {
+            <span class="field__err">{{ fieldError('location') }}</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Assigned to</span>
+          <select formControlName="assignedToUserId">
+            <option value="">— Unassigned</option>
+            @for (u of users(); track u.id) {
+              <option [value]="u.id">{{ u.name }} ({{ u.role }})</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="form__actions">
+        <button type="submit" class="btn btn--primary" [disabled]="saving()">
+          {{ saving() ? 'Saving…' : mode === 'create' ? 'Create device' : 'Save changes' }}
+        </button>
+        <a routerLink="/devices" class="btn btn--ghost">Cancel</a>
+      </div>
+    </form>
+  }
+</section>
