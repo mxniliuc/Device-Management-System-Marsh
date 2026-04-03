@@ -64,6 +64,36 @@
   font-size: 1rem;
 }
 
+.assignment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.assignment__name {
+  font-weight: 600;
+}
+
+.assignment__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.assignment__err {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #a93226;
+}
+
+.assignment__hint {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 42ch;
+  line-height: 1.4;
+}
+
 .pill {
   display: inline-block;
   padding: 0.15rem 0.55rem;
@@ -113,6 +143,11 @@
   background: var(--color-surface);
   color: var(--color-text);
   border-color: var(--color-border);
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .link {

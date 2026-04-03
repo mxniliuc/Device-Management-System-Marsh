@@ -12,7 +12,15 @@
         class="shell__link"
         >Devices</a
       >
-      <a routerLink="/devices/new" class="shell__cta">Add device</a>
+      @if (auth.token()) {
+        <a routerLink="/devices/new" class="shell__cta">Add device</a>
+        <button type="button" class="shell__signout" (click)="signOut()">
+          Sign out
+        </button>
+      } @else {
+        <a routerLink="/login" class="shell__link">Sign in</a>
+        <a routerLink="/register" class="shell__cta shell__cta--ghost">Register</a>
+      }
     </nav>
   </header>
   <main class="shell__main">

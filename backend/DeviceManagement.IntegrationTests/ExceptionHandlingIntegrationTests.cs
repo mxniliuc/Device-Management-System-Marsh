@@ -21,6 +21,7 @@ public sealed class ExceptionHandlingIntegrationTests
     public async Task Invalid_json_returns_400_problem_json()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "api/users")
         {

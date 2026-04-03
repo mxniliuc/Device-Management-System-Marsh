@@ -21,6 +21,7 @@ public sealed class DevicesApiTests
     public async Task GetAll_returns_empty_list_when_database_is_empty()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var response = await _client.GetAsync("api/devices");
         response.EnsureSuccessStatusCode();
@@ -34,6 +35,7 @@ public sealed class DevicesApiTests
     public async Task Create_then_GetById_returns_device()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var body = new
         {
@@ -68,6 +70,7 @@ public sealed class DevicesApiTests
     public async Task Create_with_assigned_user_persists_assignment()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var userPost = await _client.PostAsJsonAsync(
             "api/users",
@@ -101,6 +104,7 @@ public sealed class DevicesApiTests
     public async Task GetById_returns_not_found_for_unknown_id()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var response = await _client.GetAsync("api/devices/507f1f77bcf86cd799439011");
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -110,6 +114,7 @@ public sealed class DevicesApiTests
     public async Task Update_returns_no_content_and_persists_changes()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var body = new
         {
@@ -158,6 +163,7 @@ public sealed class DevicesApiTests
     public async Task Delete_returns_no_content_and_removes_device()
     {
         await _factory.ResetDatabaseAsync();
+        await AuthTestHelper.ArrangeAuthenticatedAsync(_client);
 
         var body = new
         {

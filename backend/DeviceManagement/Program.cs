@@ -1,3 +1,16 @@
+using System.Text;
+using DeviceManagement.Auth;
+using DeviceManagement.ExceptionHandling;
+using DeviceManagement.Models;
+using DeviceManagement.MongoDb;
+using DeviceManagement.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
@@ -7,18 +20,76 @@ builder.Services
         o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Device Management API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Paste a JWT from POST /api/auth/login or /api/auth/register."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddProblemDetails();
-builder.Services.AddExceptionHandler<DeviceManagement.ExceptionHandling.GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-builder.Services.Configure<DeviceManagement.MongoDb.MongoDbOptions>(
-    builder.Configuration.GetSection(DeviceManagement.MongoDb.MongoDbOptions.SectionName));
+builder.Services.Configure<MongoDbOptions>(
+    builder.Configuration.GetSection(MongoDbOptions.SectionName));
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection(JwtOptions.SectionName));
 
-builder.Services.AddSingleton<DeviceManagement.MongoDb.MongoDbContext>();
+builder.Services.AddSingleton<MongoDbContext>();
 
-builder.Services.AddScoped<DeviceManagement.Repositories.IDeviceRepository, DeviceManagement.Repositories.DeviceRepository>();
-builder.Services.AddScoped<DeviceManagement.Repositories.IUserRepository, DeviceManagement.Repositories.UserRepository>();
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthUserRepository, AuthUserRepository>();
+
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddSingleton<IPasswordHasher<AuthUser>, PasswordHasher<AuthUser>>();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtOptions>>((options, jwtAccessor) =>
+    {
+        var jwt = jwtAccessor.Value;
+        if (string.IsNullOrWhiteSpace(jwt.Key) || jwt.Key.Length < 32)
+            throw new InvalidOperationException("Jwt:Key must be at least 32 characters.");
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+            ValidIssuer = jwt.Issuer,
+            ValidAudience = jwt.Audience,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1)
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 builder.Services.AddCors(options =>
 {
@@ -46,6 +117,9 @@ if (!app.Environment.IsEnvironment("Testing"))
 }
 
 app.UseCors("Frontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
