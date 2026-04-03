@@ -1,3 +1,4 @@
+using DeviceManagement.Ai;
 using DeviceManagement.Auth;
 using DeviceManagement.MongoDb;
 using Microsoft.AspNetCore.Hosting;
@@ -89,7 +90,8 @@ public sealed class DeviceManagementWebApplicationFactory : WebApplicationFactor
                 [$"{JwtOptions.SectionName}:Key"] = "test-secret-key-at-least-32-characters-long!!",
                 [$"{JwtOptions.SectionName}:Issuer"] = "DeviceManagement",
                 [$"{JwtOptions.SectionName}:Audience"] = "DeviceManagement",
-                [$"{JwtOptions.SectionName}:ExpiresMinutes"] = "120"
+                [$"{JwtOptions.SectionName}:ExpiresMinutes"] = "120",
+                [$"{LlmDescriptionOptions.SectionName}:Enabled"] = "false"
             });
         });
     }
