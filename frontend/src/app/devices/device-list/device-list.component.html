@@ -1,0 +1,55 @@
+<section class="page" aria-labelledby="devices-heading">
+  <header class="page__head">
+    <div>
+      <h1 id="devices-heading">Devices</h1>
+      <p class="page__lede">Company hardware at a glance — who has what, and where it lives.</p>
+    </div>
+    <a routerLink="/devices/new" class="btn btn--primary">Add device</a>
+  </header>
+
+  @if (loading()) {
+    <p class="state state--muted" role="status">Loading devices…</p>
+  } @else if (error()) {
+    <div class="banner banner--error" role="alert">{{ error() }}</div>
+  } @else if (devices().length === 0) {
+    <div class="empty">
+      <p>No devices yet.</p>
+      <a routerLink="/devices/new" class="btn btn--primary">Register your first device</a>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Device</th>
+            <th scope="col">Manufacturer</th>
+            <th scope="col">Type</th>
+            <th scope="col">Assigned to</th>
+            <th scope="col">Location</th>
+            <th scope="col" class="table__actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of devices(); track d.id) {
+            <tr>
+              <td>
+                <a [routerLink]="['/devices', d.id]" class="table__link">{{ d.name }}</a>
+              </td>
+              <td>{{ d.manufacturer }}</td>
+              <td><span class="pill">{{ typeLabel(d.type) }}</span></td>
+              <td>{{ userLabel(d.assignedToUserId) }}</td>
+              <td>{{ d.location }}</td>
+              <td class="table__actions">
+                <a [routerLink]="['/devices', d.id]" class="link">View</a>
+                <a [routerLink]="['/devices', d.id, 'edit']" class="link">Edit</a>
+                <button type="button" class="link link--danger" (click)="deleteDevice(d, $event)">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
