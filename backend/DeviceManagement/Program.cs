@@ -69,6 +69,8 @@ builder.Services.AddSingleton<IDeviceDescriptionGenerator, OllamaChatDescription
 
 builder.Services.AddSingleton<MongoDbContext>();
 
+builder.Services.AddHostedService<DeviceTextSearchBootstrapper>();
+
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthUserRepository, AuthUserRepository>();
