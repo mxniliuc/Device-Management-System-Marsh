@@ -1,0 +1,54 @@
+/* Global design tokens — warm slate + teal accent */
+:root {
+  --color-bg: #f4f1ec;
+  --color-surface: #fffcf7;
+  --color-text: #1c1b19;
+  --color-text-muted: #5c5854;
+  --color-border: #e3ddd4;
+  --color-accent: #2a9d8f;
+  --color-accent-strong: #1f7a6f;
+  --color-link: #156b62;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-soft: 0 12px 32px rgba(28, 27, 25, 0.06);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: radial-gradient(
+      1200px 600px at 10% -10%,
+      color-mix(in oklab, var(--color-accent) 14%, transparent),
+      transparent 55%
+    ),
+    var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+a {
+  color: var(--color-link);
+}
