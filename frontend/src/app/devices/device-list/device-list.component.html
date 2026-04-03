@@ -7,6 +7,19 @@
     <a routerLink="/devices/new" class="btn btn--primary">Add device</a>
   </header>
 
+  <div class="search-row">
+    <label class="search-row__label" for="device-search">Search</label>
+    <input
+      id="device-search"
+      type="search"
+      class="search-row__input"
+      placeholder="Name, manufacturer, processor, RAM…"
+      autocomplete="off"
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
   @if (loading()) {
     <p class="state state--muted" role="status">Loading devices…</p>
   } @else if (error()) {

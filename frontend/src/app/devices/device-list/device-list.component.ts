@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged, forkJoin, Subject } from 'rxjs';
 import { Device, deviceTypeLabel } from '../../core/models/device.model';
 import { User } from '../../core/models/user.model';
 import { DeviceService } from '../../core/services/device.service';
@@ -17,16 +18,23 @@ import { UserService } from '../../core/services/user.service';
 export class DeviceListComponent implements OnInit {
   private readonly devicesApi = inject(DeviceService);
   private readonly usersApi = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly searchTerms = new Subject<string>();
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly devices = signal<Device[]>([]);
+  readonly searchQuery = signal('');
   private userNameById = new Map<string, string>();
 
   readonly typeLabel = deviceTypeLabel;
 
   ngOnInit(): void {
-    this.load();
+    this.searchTerms
+      .pipe(debounceTime(350), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((q) => this.loadWithSearchQuery(q));
+
+    this.loadWithSearchQuery('');
   }
 
   userLabel(userId: string | null): string {
@@ -34,18 +42,29 @@ export class DeviceListComponent implements OnInit {
     return this.userNameById.get(userId) ?? 'Unknown user';
   }
 
-  private load(): void {
+  onSearchInput(ev: Event): void {
+    const el = ev.target as HTMLInputElement;
+    this.searchQuery.set(el.value);
+    this.searchTerms.next(el.value.trim());
+  }
+
+  private loadWithSearchQuery(q: string): void {
     this.loading.set(true);
     this.error.set(null);
+    const devices$ = q.length > 0 ? this.devicesApi.search(q) : this.devicesApi.getAll();
     forkJoin({
-      devices: this.devicesApi.getAll(),
+      devices: devices$,
       users: this.usersApi.getAll(),
     }).subscribe({
       next: ({ devices, users }) => {
         this.userNameById = new Map(users.map((u: User) => [u.id, u.name]));
-        this.devices.set(
-          [...devices].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })),
-        );
+        const sorted =
+          q.length > 0
+            ? devices
+            : [...devices].sort((a, b) =>
+                a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+              );
+        this.devices.set(sorted);
         this.loading.set(false);
       },
       error: () => {
@@ -63,7 +82,7 @@ export class DeviceListComponent implements OnInit {
     );
     if (!ok) return;
     this.devicesApi.delete(device.id).subscribe({
-      next: () => this.load(),
+      next: () => this.loadWithSearchQuery(this.searchQuery().trim()),
       error: () => window.alert('Could not delete this device. Please try again.'),
     });
   }
