@@ -1,0 +1,16 @@
+# Local Ollama for Device Management AI descriptions (OpenAI-compatible API on port 11434).
+# Usage:
+#   docker compose -f docker-compose.ollama.yml up -d
+#   docker compose -f docker-compose.ollama.yml exec ollama ollama pull llama3.2
+# If the API runs inside Docker too, set LlmDescription:BaseUrl to http://host.docker.internal:11434/v1
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  ollama_data:
