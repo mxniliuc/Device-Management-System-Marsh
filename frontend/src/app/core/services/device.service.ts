@@ -16,6 +16,12 @@ export class DeviceService {
     return this.http.get<Device[]>(this.baseUrl);
   }
 
+  /** Full-text search (MongoDB text index), results ordered by relevance. */
+  search(q: string): Observable<Device[]> {
+    const params = { q: q.trim() };
+    return this.http.get<Device[]>(`${this.baseUrl}/search`, { params });
+  }
+
   getById(id: string): Observable<Device> {
     return this.http.get<Device>(`${this.baseUrl}/${id}`);
   }
