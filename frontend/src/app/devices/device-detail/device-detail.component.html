@@ -42,12 +42,43 @@
       </div>
       <div>
         <dt>Assigned to</dt>
-        <dd>
+        <dd class="assignment">
           @if (device()!.assignedToUserId) {
-            {{ assignedUserName() ?? 'Unknown user' }}
+            <span class="assignment__name">{{
+              assignedUserName() ?? 'Unknown user'
+            }}</span>
           } @else {
             <span class="muted">Unassigned</span>
           }
+          @if (assignmentError()) {
+            <p class="assignment__err" role="alert">{{ assignmentError() }}</p>
+          }
+          <div class="assignment__actions">
+            @if (!device()!.assignedToUserId) {
+              <button
+                type="button"
+                class="btn btn--primary"
+                [disabled]="assignBusy()"
+                (click)="assignToMe()"
+              >
+                {{ assignBusy() ? 'Working…' : 'Assign to me' }}
+              </button>
+            } @else if (isAssignedToMe()) {
+              <button
+                type="button"
+                class="btn btn--ghost"
+                [disabled]="assignBusy()"
+                (click)="unassign()"
+              >
+                {{ assignBusy() ? 'Working…' : 'Unassign' }}
+              </button>
+            } @else if (isAssignedToSomeoneElse()) {
+              <p class="assignment__hint muted">
+                Assigned to another user. Only they can unassign, or an admin can
+                change it when editing the device.
+              </p>
+            }
+          </div>
         </dd>
       </div>
     </dl>
