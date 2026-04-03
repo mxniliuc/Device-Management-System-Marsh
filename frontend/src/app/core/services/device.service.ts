@@ -27,4 +27,14 @@ export class DeviceService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  /** Assigns the device to the signed-in user (API: unassigned or already yours). */
+  assignToSelf(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/assign`, {});
+  }
+
+  /** Clears assignment when the device is assigned to you. */
+  unassignSelf(id: string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/${id}/unassign`, {});
+  }
 }
