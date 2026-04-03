@@ -1,3 +1,4 @@
+using DeviceManagement.Ai;
 using DeviceManagement.Auth;
 using DeviceManagement.MongoDb;
 using Microsoft.AspNetCore.Hosting;
@@ -13,12 +14,16 @@ namespace DeviceManagement.IntegrationTests;
 /// <summary>
 /// Mongo: <c>INTEGRATION_TESTS_MONGO_CONNECTION_STRING</c>, else Docker Testcontainers, else
 /// <c>mongodb://127.0.0.1:27017</c> if a ping succeeds (no Docker required).
+/// Teardown: Testcontainers are disposed; for any non-container connection, the integration database is dropped so data does not linger on a shared Mongo instance.
 /// </summary>
 public sealed class DeviceManagementWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     internal const string IntegrationMongoEnv = "INTEGRATION_TESTS_MONGO_CONNECTION_STRING";
 
     private const string DefaultLocalMongo = "mongodb://127.0.0.1:27017";
+
+    /// <summary>Must match <c>MongoDb:DatabaseName</c> configured for integration tests.</summary>
+    private const string IntegrationTestDatabaseName = "device_management_integration_tests";
 
     private readonly string? _externalConnectionString = Environment.GetEnvironmentVariable(IntegrationMongoEnv);
     private MongoDbContainer? _mongo;
@@ -68,9 +73,40 @@ public sealed class DeviceManagementWebApplicationFactory : WebApplicationFactor
 
     async Task IAsyncLifetime.DisposeAsync()
     {
-        await DisposeAsync();
-        if (_mongo is not null)
-            await _mongo.DisposeAsync();
+        try
+        {
+            await base.DisposeAsync();
+        }
+        finally
+        {
+            if (_mongo is not null)
+            {
+                await _mongo.DisposeAsync();
+                _mongo = null;
+            }
+            else
+            {
+                // Local Mongo or INTEGRATION_TESTS_MONGO_CONNECTION_STRING: no container to remove, so drop the DB.
+                await DropIntegrationDatabaseIfPersistentAsync();
+            }
+        }
+    }
+
+    private async Task DropIntegrationDatabaseIfPersistentAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_resolvedConnectionString))
+            return;
+
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var client = new MongoClient(_resolvedConnectionString);
+            await client.DropDatabaseAsync(IntegrationTestDatabaseName, cts.Token);
+        }
+        catch
+        {
+            // Best-effort teardown; do not hide test failures.
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -85,11 +121,12 @@ public sealed class DeviceManagementWebApplicationFactory : WebApplicationFactor
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 [$"{MongoDbOptions.SectionName}:ConnectionString"] = connectionString,
-                [$"{MongoDbOptions.SectionName}:DatabaseName"] = "device_management_integration_tests",
+                [$"{MongoDbOptions.SectionName}:DatabaseName"] = IntegrationTestDatabaseName,
                 [$"{JwtOptions.SectionName}:Key"] = "test-secret-key-at-least-32-characters-long!!",
                 [$"{JwtOptions.SectionName}:Issuer"] = "DeviceManagement",
                 [$"{JwtOptions.SectionName}:Audience"] = "DeviceManagement",
-                [$"{JwtOptions.SectionName}:ExpiresMinutes"] = "120"
+                [$"{JwtOptions.SectionName}:ExpiresMinutes"] = "120",
+                [$"{LlmDescriptionOptions.SectionName}:Enabled"] = "false"
             });
         });
     }

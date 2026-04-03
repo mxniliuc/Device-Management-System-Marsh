@@ -18,6 +18,17 @@ export interface Device {
   assignedAt: string | null;
 }
 
+/** Body for POST /api/devices/generate-description (no description/location yet). */
+export interface GenerateDeviceDescriptionPayload {
+  name: string;
+  manufacturer: string;
+  type: DeviceType;
+  os: string;
+  osVersion: string;
+  processor: string;
+  ramGb: number;
+}
+
 export interface DeviceWritePayload {
   name: string;
   manufacturer: string;

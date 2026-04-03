@@ -1,4 +1,5 @@
 using System.Text;
+using DeviceManagement.Ai;
 using DeviceManagement.Auth;
 using DeviceManagement.ExceptionHandling;
 using DeviceManagement.Models;
@@ -51,6 +52,20 @@ builder.Services.Configure<MongoDbOptions>(
     builder.Configuration.GetSection(MongoDbOptions.SectionName));
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection(JwtOptions.SectionName));
+builder.Services.Configure<LlmDescriptionOptions>(
+    builder.Configuration.GetSection(LlmDescriptionOptions.SectionName));
+
+builder.Services.AddHttpClient("LlmDescription", (sp, client) =>
+{
+    var opt = sp.GetRequiredService<IOptionsMonitor<LlmDescriptionOptions>>().CurrentValue;
+    var baseUrl = string.IsNullOrWhiteSpace(opt.BaseUrl)
+        ? "http://127.0.0.1:11434/v1"
+        : opt.BaseUrl.TrimEnd('/');
+    client.BaseAddress = new Uri(baseUrl + "/");
+    client.Timeout = TimeSpan.FromSeconds(120);
+});
+
+builder.Services.AddSingleton<IDeviceDescriptionGenerator, OllamaChatDescriptionGenerator>();
 
 builder.Services.AddSingleton<MongoDbContext>();
 

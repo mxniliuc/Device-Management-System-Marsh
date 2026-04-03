@@ -1,6 +1,19 @@
 @DeviceManagement_HostAddress = http://localhost:5084
+@Bearer = paste_jwt_here
 
-GET {{DeviceManagement_HostAddress}}/weatherforecast/
-Accept: application/json
+### Generate device description (Ollama: ollama serve + ollama pull llama3.2)
+POST {{DeviceManagement_HostAddress}}/api/devices/generate-description
+Authorization: Bearer {{Bearer}}
+Content-Type: application/json
+
+{
+  "name": "iPhone 17 Pro",
+  "manufacturer": "Apple",
+  "type": "Phone",
+  "os": "iOS",
+  "osVersion": "26",
+  "processor": "A19 Pro",
+  "ramGb": 12
+}
 
 ###

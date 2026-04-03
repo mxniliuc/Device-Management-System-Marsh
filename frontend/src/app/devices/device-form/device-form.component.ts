@@ -33,6 +33,7 @@ export class DeviceFormComponent implements OnInit {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
+  readonly generatingDescription = signal(false);
   readonly loadError = signal<string | null>(null);
   readonly formError = signal<string | null>(null);
 
@@ -121,6 +122,51 @@ export class DeviceFormComponent implements OnInit {
         },
       });
     }
+  }
+
+  generateDescriptionWithAi(): void {
+    this.formError.set(null);
+    const c = this.form.controls;
+    const specs = [
+      c.name,
+      c.manufacturer,
+      c.os,
+      c.osVersion,
+      c.processor,
+      c.ramGb,
+    ];
+    const invalid = specs.some((x) => x.invalid);
+    if (invalid) {
+      specs.forEach((x) => x.markAsTouched());
+      this.formError.set(
+        'Enter name, manufacturer, OS, OS version, processor, and RAM before generating a description.',
+      );
+      return;
+    }
+
+    const raw = this.form.getRawValue();
+    this.generatingDescription.set(true);
+    this.devicesApi
+      .generateDescription({
+        name: raw.name.trim(),
+        manufacturer: raw.manufacturer.trim(),
+        type: raw.type,
+        os: raw.os.trim(),
+        osVersion: raw.osVersion.trim(),
+        processor: raw.processor.trim(),
+        ramGb: Number(raw.ramGb),
+      })
+      .subscribe({
+        next: (r) => {
+          this.form.patchValue({ description: r.description });
+          this.form.controls.description.markAsTouched();
+          this.generatingDescription.set(false);
+        },
+        error: (err: unknown) => {
+          this.generatingDescription.set(false);
+          this.formError.set(parseApiError(err));
+        },
+      });
   }
 
   submit(): void {

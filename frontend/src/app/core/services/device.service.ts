@@ -1,7 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Device, DeviceWritePayload } from '../models/device.model';
+import {
+  Device,
+  DeviceWritePayload,
+  GenerateDeviceDescriptionPayload,
+} from '../models/device.model';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
@@ -14,6 +18,16 @@ export class DeviceService {
 
   getById(id: string): Observable<Device> {
     return this.http.get<Device>(`${this.baseUrl}/${id}`);
+  }
+
+  /** LLM-generated one-line description (server uses Ollama at LlmDescription:BaseUrl by default). */
+  generateDescription(
+    body: GenerateDeviceDescriptionPayload,
+  ): Observable<{ description: string }> {
+    return this.http.post<{ description: string }>(
+      `${this.baseUrl}/generate-description`,
+      body,
+    );
   }
 
   create(body: DeviceWritePayload): Observable<Device> {

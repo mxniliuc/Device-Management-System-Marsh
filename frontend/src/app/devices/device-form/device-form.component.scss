@@ -41,10 +41,26 @@
   grid-column: 1 / -1;
 }
 
+.field__label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+}
+
 .field__label {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-text-muted);
+}
+
+.field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  max-width: 52ch;
+  line-height: 1.35;
 }
 
 .field input,
@@ -105,6 +121,12 @@
   background: var(--color-surface);
   color: var(--color-text);
   border-color: var(--color-border);
+}
+
+.btn--small {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .banner {

@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using DeviceManagement.Ai;
 using DeviceManagement.Contracts.Devices;
 using DeviceManagement.Models;
 using DeviceManagement.Repositories;
 using DeviceManagement.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace DeviceManagement.Controllers;
 
@@ -15,10 +17,59 @@ namespace DeviceManagement.Controllers;
 public sealed class DevicesController : ControllerBase
 {
     private readonly IDeviceRepository _devices;
+    private readonly IDeviceDescriptionGenerator _descriptionGenerator;
+    private readonly LlmDescriptionOptions _llmOptions;
 
-    public DevicesController(IDeviceRepository devices)
+    public DevicesController(
+        IDeviceRepository devices,
+        IDeviceDescriptionGenerator descriptionGenerator,
+        IOptions<LlmDescriptionOptions> llmOptions)
     {
         _devices = devices;
+        _descriptionGenerator = descriptionGenerator;
+        _llmOptions = llmOptions.Value;
+    }
+
+    /// <summary>Uses a configured LLM to draft a short inventory description from technical specs.</summary>
+    [HttpPost("generate-description")]
+    [ProducesResponseType(typeof(GenerateDeviceDescriptionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<GenerateDeviceDescriptionResponse>> GenerateDescription(
+        [FromBody] GenerateDeviceDescriptionRequest request,
+        CancellationToken ct)
+    {
+        if (!_llmOptions.Enabled)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new ProblemDetails
+            {
+                Title = "AI description disabled",
+                Detail = "Set LlmDescription:Enabled to true and ensure Ollama is running with the configured model."
+            });
+        }
+
+        try
+        {
+            var text = await _descriptionGenerator.GenerateAsync(request, ct);
+            return Ok(new GenerateDeviceDescriptionResponse(text));
+        }
+        catch (HttpRequestException ex)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new ProblemDetails
+            {
+                Title = "LLM request failed",
+                Detail = ex.Message
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Could not generate description",
+                Detail = ex.Message
+            });
+        }
     }
 
     [HttpGet]
