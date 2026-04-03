@@ -21,5 +21,6 @@ public sealed class MongoDbContext
 
     public IMongoCollection<Models.User> Users => Database.GetCollection<Models.User>("users");
     public IMongoCollection<Models.Device> Devices => Database.GetCollection<Models.Device>("devices");
+    public IMongoCollection<Models.AuthUser> AuthUsers => Database.GetCollection<Models.AuthUser>("auth_users");
 }
 
