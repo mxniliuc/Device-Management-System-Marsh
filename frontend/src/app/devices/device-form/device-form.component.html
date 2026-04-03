@@ -4,7 +4,8 @@
       <a routerLink="/devices" class="back">← All devices</a>
       <h1>{{ mode === 'create' ? 'Add device' : 'Edit device' }}</h1>
       <p class="page__lede">
-        All fields are required except assignment — leave unassigned if nobody is using it yet.
+        All fields are required except assignment — leave unassigned if nobody is using it yet. You can
+        draft the description with AI (Ollama, local) once the technical fields are filled.
       </p>
     </div>
   </header>
@@ -77,13 +78,26 @@
           }
         </label>
 
-        <label class="field field--wide">
-          <span class="field__label">Description</span>
+        <div class="field field--wide">
+          <div class="field__label-row">
+            <span class="field__label">Description</span>
+            <button
+              type="button"
+              class="btn btn--ghost btn--small"
+              [disabled]="generatingDescription()"
+              (click)="generateDescriptionWithAi()"
+            >
+              {{ generatingDescription() ? 'Generating…' : 'Generate with AI' }}
+            </button>
+          </div>
           <textarea formControlName="description" rows="3"></textarea>
           @if (fieldError('description')) {
             <span class="field__err">{{ fieldError('description') }}</span>
           }
-        </label>
+          <p class="field__hint">
+            Optional: fill technical fields above, then generate via local Ollama (see scripts/setup-ollama.sh).
+          </p>
+        </div>
 
         <label class="field">
           <span class="field__label">Location</span>
