@@ -1,6 +1,12 @@
 @DeviceManagement_HostAddress = http://localhost:5084
 @Bearer = paste_jwt_here
 
+### Search devices (MongoDB text index: name, manufacturer, processor, RAM)
+GET {{DeviceManagement_HostAddress}}/api/devices/search?q=surface+16
+Authorization: Bearer {{Bearer}}
+
+###
+
 ### Generate device description (Ollama: ollama serve + ollama pull llama3.2)
 POST {{DeviceManagement_HostAddress}}/api/devices/generate-description
 Authorization: Bearer {{Bearer}}

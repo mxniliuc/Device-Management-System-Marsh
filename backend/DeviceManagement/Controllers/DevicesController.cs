@@ -4,10 +4,12 @@ using DeviceManagement.Ai;
 using DeviceManagement.Contracts.Devices;
 using DeviceManagement.Models;
 using DeviceManagement.Repositories;
+using DeviceManagement.Search;
 using DeviceManagement.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace DeviceManagement.Controllers;
 
@@ -76,6 +78,36 @@ public sealed class DevicesController : ControllerBase
     public async Task<ActionResult<List<Device>>> GetAll(CancellationToken ct)
     {
         return await _devices.GetAllAsync(ct);
+    }
+
+    /// <summary>Full-text search (MongoDB text index). Fields: name, manufacturer, processor, RAM. Results ordered by relevance score.</summary>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(List<Device>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<List<Device>>> Search([FromQuery(Name = "q")] string? q, CancellationToken ct)
+    {
+        var normalized = DeviceSearchQueryNormalizer.Normalize(q);
+        if (normalized.Length == 0)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid search query",
+                Detail = "Provide q with at least one letter or digit after normalizing spaces and punctuation."
+            });
+        }
+
+        try
+        {
+            return await _devices.SearchAsync(normalized, ct);
+        }
+        catch (MongoException ex)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Invalid search query",
+                Detail = ex.Message
+            });
+        }
     }
 
     [HttpGet("{id}")]

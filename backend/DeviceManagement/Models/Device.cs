@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -31,6 +32,11 @@ public sealed class Device
 
     [BsonElement("ramGb")]
     public int RamGb { get; set; }
+
+    /// <summary>Denormalized RAM tokens for MongoDB text index (not exposed in JSON API).</summary>
+    [BsonElement("ramSearch")]
+    [JsonIgnore]
+    public string RamSearch { get; set; } = string.Empty;
 
     [BsonElement("description")]
     public string Description { get; set; } = string.Empty;
