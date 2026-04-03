@@ -1,0 +1,55 @@
+@if (loading()) {
+  <p class="state state--muted" role="status">Loading device…</p>
+} @else if (error()) {
+  <div class="banner banner--error" role="alert">{{ error() }}</div>
+  <p><a routerLink="/devices" class="link">Back to devices</a></p>
+} @else if (device()) {
+  <article class="detail">
+    <header class="detail__head">
+      <div>
+        <a routerLink="/devices" class="back">← All devices</a>
+        <h1>{{ device()!.name }}</h1>
+        <p class="detail__meta">
+          {{ device()!.manufacturer }} · <span class="pill">{{ typeLabel(device()!.type) }}</span>
+        </p>
+      </div>
+      <div class="detail__actions">
+        <a [routerLink]="['/devices', device()!.id, 'edit']" class="btn btn--primary">Edit</a>
+        <button type="button" class="btn btn--ghost" (click)="delete()">Delete</button>
+      </div>
+    </header>
+
+    <dl class="grid">
+      <div>
+        <dt>Operating system</dt>
+        <dd>{{ device()!.os }} {{ device()!.osVersion }}</dd>
+      </div>
+      <div>
+        <dt>Processor</dt>
+        <dd>{{ device()!.processor }}</dd>
+      </div>
+      <div>
+        <dt>RAM</dt>
+        <dd>{{ device()!.ramGb }} GB</dd>
+      </div>
+      <div>
+        <dt>Location</dt>
+        <dd>{{ device()!.location }}</dd>
+      </div>
+      <div class="grid__full">
+        <dt>Description</dt>
+        <dd>{{ device()!.description }}</dd>
+      </div>
+      <div>
+        <dt>Assigned to</dt>
+        <dd>
+          @if (device()!.assignedToUserId) {
+            {{ assignedUserName() ?? 'Unknown user' }}
+          } @else {
+            <span class="muted">Unassigned</span>
+          }
+        </dd>
+      </div>
+    </dl>
+  </article>
+}
