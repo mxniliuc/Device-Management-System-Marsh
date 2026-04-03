@@ -3,11 +3,13 @@ using DeviceManagement.Contracts.Users;
 using DeviceManagement.Models;
 using DeviceManagement.Repositories;
 using DeviceManagement.Validation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeviceManagement.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/users")]
 public sealed class UsersController : ControllerBase
 {
@@ -74,4 +76,3 @@ public sealed class UsersController : ControllerBase
         return deleted ? NoContent() : NotFound();
     }
 }
-
