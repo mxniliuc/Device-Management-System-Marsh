@@ -8,3 +8,4 @@ obj/
 .nuget/
 ./backend/DeviceManagement/obj/
 ./backend/DeviceManagement/bin/
+.vscode/

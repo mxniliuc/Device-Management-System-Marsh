@@ -20,6 +20,16 @@ builder.Services.AddSingleton<DeviceManagement.MongoDb.MongoDbContext>();
 builder.Services.AddScoped<DeviceManagement.Repositories.IDeviceRepository, DeviceManagement.Repositories.DeviceRepository>();
 builder.Services.AddScoped<DeviceManagement.Repositories.IUserRepository, DeviceManagement.Repositories.UserRepository>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -34,6 +44,8 @@ if (!app.Environment.IsEnvironment("Testing"))
 {
     app.UseHttpsRedirection();
 }
+
+app.UseCors("Frontend");
 
 app.MapControllers();
 

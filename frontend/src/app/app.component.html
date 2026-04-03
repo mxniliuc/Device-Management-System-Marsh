@@ -1,0 +1,21 @@
+<div class="shell">
+  <header class="shell__header">
+    <div class="shell__brand">
+      <a routerLink="/devices" class="shell__logo">{{ title }}</a>
+      <span class="shell__tagline">Company hardware</span>
+    </div>
+    <nav class="shell__nav" aria-label="Main">
+      <a
+        routerLink="/devices"
+        routerLinkActive="shell__link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="shell__link"
+        >Devices</a
+      >
+      <a routerLink="/devices/new" class="shell__cta">Add device</a>
+    </nav>
+  </header>
+  <main class="shell__main">
+    <router-outlet />
+  </main>
+</div>
